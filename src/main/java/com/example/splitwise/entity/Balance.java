@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Balance {
-    private double amountOwe;
-    private double amountGetBack;
+    private double amountOwe = 0.0;
+    private double amountGetBack = 0.0;
 }
