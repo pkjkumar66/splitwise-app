@@ -1,6 +1,7 @@
 package com.example.splitwise.controller;
 
 import com.example.splitwise.entity.Expense;
+import com.example.splitwise.entity.Group;
 import com.example.splitwise.entity.Split;
 import com.example.splitwise.entity.SplitType;
 import com.example.splitwise.entity.User;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class ExpenseController {
     private List<Expense> expenses = new ArrayList<>();
     private UserExpenseBalanceSheetController balanceSheetController;
+    private GroupController groupController;
 
     public Expense createExpense(String description, double expenseAmount, User paidByUser, SplitType splitType,
                                  List<Split> splits) {
@@ -37,6 +39,16 @@ public class ExpenseController {
         expenses.add(expense);
         balanceSheetController.updateBalanceSheet(expenseAmount, paidByUser, splits);
 
+        return expense;
+    }
+
+    public Expense createGroupExpense(String description, double expenseAmount, User paidByUser, SplitType splitType,
+                                      List<Split> splits, String groupId) {
+        Group group = groupController.getGroupById(groupId);
+        Expense expense = createExpense(description, expenseAmount, paidByUser, splitType, splits);
+        List<Expense> expenses = group.getExpenses();
+        expenses.add(expense);
+        group.setExpenses(expenses);
         return expense;
     }
 

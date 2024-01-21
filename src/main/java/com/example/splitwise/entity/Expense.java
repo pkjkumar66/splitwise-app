@@ -14,7 +14,7 @@ import java.util.List;
 public class Expense {
     private String id;
     private String description;
-    private double expenseAmount;
+    private double expenseAmount = 0.0;
     private User amountPaidByUser;
     private SplitType splitType;
     private List<Split> splits;

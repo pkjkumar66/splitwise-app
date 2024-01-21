@@ -23,13 +23,9 @@ public class UserExpenseBalanceSheetController {
             if (Objects.nonNull(paidByUser) && paidByUser.getId().equals(split.getUser().getId())) {
                 double splitAmount = expenseAmount / (1.0 * splits.size());
                 UserExpenseBalanceSheet paidByUserBalanceSheet = paidByUser.getBalanceSheet();
-                double totalExpense = paidByUserBalanceSheet.getTotalExpense();
-                double totalAmountPaid = paidByUserBalanceSheet.getTotalAmountPaid();
-                totalExpense += splitAmount;
-                totalAmountPaid += expenseAmount;
 
-                paidByUserBalanceSheet.setTotalExpense(totalExpense);
-                paidByUserBalanceSheet.setTotalAmountPaid(totalAmountPaid);
+                paidByUserBalanceSheet.setTotalExpense(paidByUserBalanceSheet.getTotalExpense() + splitAmount);
+                paidByUserBalanceSheet.setTotalAmountPaid(paidByUserBalanceSheet.getTotalAmountPaid() + expenseAmount);
                 paidByUser.setBalanceSheet(paidByUserBalanceSheet);
             } else {
                 UserExpenseBalanceSheet paidByUserBalanceSheet = paidByUser.getBalanceSheet();
@@ -48,22 +44,38 @@ public class UserExpenseBalanceSheetController {
                 paidByUser.setBalanceSheet(paidByUserBalanceSheet);
 
                 UserExpenseBalanceSheet getBackFromUserBalanceSheet = getBackFromUser.getBalanceSheet();
-                double amountYouOwe = getBackFromUserBalanceSheet.getAmountYouOwe();
-                amountYouOwe += split.getAmountOwe();
-
-                double totalExpense = getBackFromUserBalanceSheet.getTotalExpense();
-                totalExpense += split.getAmountOwe();
-
                 Map<String, Balance> userVsBalanceOfOweUser = getBackFromUserBalanceSheet.getUserVsBalance();
-                Balance balance1 = userVsBalanceOfOweUser.getOrDefault(paidByUser.getId(), Balance.builder().build());
+                Balance balance1 = userVsBalanceOfOweUser.computeIfAbsent(paidByUser.getId(), id -> Balance.builder().build());
                 balance1.setAmountOwe(split.getAmountOwe());
-                userVsBalanceOfOweUser.replace(paidByUser.getId(), balance1);
 
-                getBackFromUserBalanceSheet.setAmountYouOwe(amountYouOwe);
-                getBackFromUserBalanceSheet.setTotalExpense(totalExpense);
+                getBackFromUserBalanceSheet.setAmountYouOwe(getBackFromUserBalanceSheet.getAmountYouOwe() + split.getAmountOwe());
+                getBackFromUserBalanceSheet.setTotalExpense(getBackFromUserBalanceSheet.getTotalExpense() + split.getAmountOwe());
                 getBackFromUserBalanceSheet.setUserVsBalance(userVsBalanceOfOweUser);
                 getBackFromUser.setBalanceSheet(getBackFromUserBalanceSheet);
             }
         });
+    }
+
+    public void showBalanceSheetOfUser(User user) {
+
+        System.out.println("---------------------------------------");
+
+        System.out.println("Balance sheet of user : " + user.getId());
+
+        UserExpenseBalanceSheet userExpenseBalanceSheet = user.getBalanceSheet();
+
+        System.out.println("TotalExpense: " + userExpenseBalanceSheet.getTotalExpense());
+        System.out.println("TotalYouGetBack: " + userExpenseBalanceSheet.getAmountYouGetBack());
+        System.out.println("TotalYouOwe: " + userExpenseBalanceSheet.getAmountYouOwe());
+        System.out.println("TotalAmountPaid: " + userExpenseBalanceSheet.getTotalAmountPaid());
+
+        for (Map.Entry<String, Balance> entry : userExpenseBalanceSheet.getUserVsBalance().entrySet()) {
+            String userID = entry.getKey();
+            Balance balance = entry.getValue();
+
+            System.out.println("userID:" + userID + " YouGetBack:" + balance.getAmountGetBack() + " YouOwe:" + balance.getAmountOwe());
+        }
+        System.out.println("---------------------------------------");
+
     }
 }

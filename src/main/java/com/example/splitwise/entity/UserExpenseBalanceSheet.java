@@ -13,9 +13,9 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserExpenseBalanceSheet {
-    private double amountYouOwe;
-    private double amountYouGetBack;
-    private double totalExpense;
-    private double totalAmountPaid;
+    private double amountYouOwe = 0.0;
+    private double amountYouGetBack = 0.0;
+    private double totalExpense = 0.0;
+    private double totalAmountPaid = 0.0;
     private Map<String, Balance> userVsBalance = new HashMap<>();
 }
